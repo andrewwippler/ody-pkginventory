@@ -35,6 +35,13 @@ module Facter::Util::Pkg
         packages << pkg.chomp.scan(/^(\S+).*\s(\d.*)/)[0]
       end
     end
+    when 'windows'
+      # csv format includes node name in first column.
+      command = 'wmic product get name,version /format:csv'
+      packages = []
+      Facter::Util::Resolution.exec(command).each_line do |pkg|
+        packages << pkg.chomp.split(",").drop(1)
+      end
     return packages
   end
 end
